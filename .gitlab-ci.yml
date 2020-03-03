@@ -22,7 +22,7 @@ variables:
 before_script:
     - echo `pwd`
     - echo `ls`
-    - chmod +x gradlew
+    - sudo chmod +x gradlew
     - export GRADLE_USER_HOME=`pwd`/.gradle
 
 # We redirect the gradle user home using -g so that it caches the
