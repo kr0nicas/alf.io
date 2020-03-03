@@ -1,12 +1,12 @@
 image: alfio/alf.io
 
 stages:
-    #- build
+    - build
     #- test
     #- deploy
 
 before_script:
-      - echo `pwd` # debug
+    - echo `pwd` # debug
     #  - echo "$CI_BUILD_NAME, $CI_BUILD_REF_NAME $CI_BUILD_STAGE" # debug
     #- export GRADLE_USER_HOME=`pwd`/.gradle
 
@@ -15,9 +15,10 @@ before_script:
 #        - .gradle/wrapper
 #        - .gradle/caches
 #
-#build:
-#    stage: build
-#    script:
+build:
+    stage: build
+    script:
+        - ./gradlew -version
 #        - ./gradlew assemble
 #    artifacts:
 #        paths:
