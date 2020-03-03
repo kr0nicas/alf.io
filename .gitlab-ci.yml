@@ -21,6 +21,8 @@ build:
     stage: build
     script:
         - ./gradlew -version
+    tags:
+        - environment:development
 #        - ./gradlew assemble
 #    artifacts:
 #        paths:
