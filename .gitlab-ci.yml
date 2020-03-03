@@ -5,7 +5,7 @@
 # https://gradle.org/
 # https://github.com/gradle/gradle
 image: adoptopenjdk/openjdk11:armv7l-centos-jdk11u-nightly-slim
-image: gradle:jdk13
+image: gradle:jdk11
 
 # Disable the Gradle daemon for Continuous Integration servers as correctness
 # is usually a priority over speed in CI environments. Using a fresh
