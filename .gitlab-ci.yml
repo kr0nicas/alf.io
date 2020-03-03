@@ -4,7 +4,7 @@
 # This is the Gradle build system for JVM applications
 # https://gradle.org/
 # https://github.com/gradle/gradle
-image: java:8
+image: adoptopenjdk/openjdk11:armv7l-centos-jdk11u-nightly-slim
 image: gradle:alpine
 
 # Disable the Gradle daemon for Continuous Integration servers as correctness
