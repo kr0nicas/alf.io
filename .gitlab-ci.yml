@@ -43,6 +43,8 @@ build:
         paths:
             - build
             - .gradle
+    tags:
+       - environment:development
 
 
 # Use the generated build output to run the tests.
@@ -57,3 +59,5 @@ test:
         paths:
             - build
             - .gradle
+    tags:
+        - environment:development
