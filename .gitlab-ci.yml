@@ -49,18 +49,26 @@ build:
     tags:
        - environment:development
 
+package:
+  stage: package
+  script:
+    - cd ./src/main/dist/
+    - docker build -t registry.gitlab.com/itproject41/eco-tickets .
+    #- docker build -t registry.gitlab.com/mathflake/api .
+    - docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN registry.gitlab.com
+    - docker push registry.gitlab.com/itproject41/eco-tickets
 
 # Use the generated build output to run the tests.
-test:
-    stage: test
-    script:
-        - ./gradlew -g /cache/.gradle check
-    script: gradle check
-    cache:
-        key: "$CI_COMMIT_REF_NAME"
-        policy: pull
-        paths:
-            - build
-            - .gradle
-    tags:
-        - environment:development
+# test:
+#     stage: test
+#     script:
+#         - ./gradlew -g /cache/.gradle check
+#     script: gradle check
+#     cache:
+#         key: "$CI_COMMIT_REF_NAME"
+#         policy: pull
+#         paths:
+#             - build
+#             - .gradle
+#     tags:
+#         - environment:development
