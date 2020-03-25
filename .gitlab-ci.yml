@@ -1,6 +1,9 @@
 # This template uses the java:8 docker image because there isn't any
 # official Gradle image at this moment
 #
+stages:
+  - build
+  - package
 # This is the Gradle build system for JVM applications
 # https://gradle.org/
 # https://github.com/gradle/gradle
@@ -57,6 +60,8 @@ package:
     #- docker build -t registry.gitlab.com/mathflake/api .
     - docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN registry.gitlab.com
     - docker push registry.gitlab.com/itproject41/eco-tickets
+  tags:
+       - environment:development
 
 # Use the generated build output to run the tests.
 # test:
