@@ -64,8 +64,6 @@ package:
              - .gradle
   tags:
         - environment:development
-  only: 
-    - 2.0-M2-maintenance
 
 # Use the generated build output to run the tests.
 test:
@@ -81,5 +79,3 @@ test:
             - .gradle
     tags:
         - environment:development
-    only: 
-        - 2.0-M2-maintenance
