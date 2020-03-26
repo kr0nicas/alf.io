@@ -11,6 +11,7 @@ image: gradle:jdk11
 stages:
   - build
   - package
+  - deploy
 
 # Disable the Gradle daemon for Continuous Integration servers as correctness
 # is usually a priority over speed in CI environments. Using a fresh
@@ -93,6 +94,51 @@ docker:
     - docker push registry.gitlab.com/itproject41/eco-tickets
   tags:
         - environment:development
+
+deploy_on_staging:
+  stage: deploy
+  image: docker:latest
+  variables:
+    DOCKER_DRIVER: overlay2
+    DOCKER_TLS_CERTDIR: "/certs"
+  services:
+    - docker:dind
+  before_script:
+    # Install ssh-agent if not already installed, it is required by Docker.
+    # (change apt-get to yum if you use a CentOS-based image)
+    - 'which ssh-agent || ( apk update -y && apk install openssh-client -y )'
+    # Run ssh-agent (inside the build environment)
+    - eval `ssh-agent -s`
+    # Add the SSH key stored in SSH_PRIVATE_KEY variable to the agent store
+    #- ssh-add <(echo "$SSH_PRIVATE_KEY")
+    #- echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -
+    - echo "$SSH_PRIVATE_KEY" > /tmp/gitlab_ci_ssh
+    - chmod 600 /tmp/gitlab_ci_ssh
+    - ssh-add /tmp/gitlab_ci_ssh
+    ##
+    ## Create the SSH directory and give it the right permissions
+    ##
+    - mkdir -p ~/.ssh
+    - chmod 700 ~/.ssh
+    ##
+    ## Use ssh-keyscan to scan the keys of your private server. Replace gitlab.com
+    ## with your own domain name. You can copy and repeat that command if you have
+    ## more than one server to connect to.
+    ##
+    - ssh-keyscan ${DEPLOYMENT_SERVER_IP} >> ~/.ssh/known_hosts
+    - chmod 644 ~/.ssh/known_hosts
+  script:
+    - apk upgrade && apk update
+    #- apk add openssh-client
+    #- apk add sshpass
+    - ssh ${DEPLOYMENT_SERVER_USER}@${DEPLOYMENT_SERVER_IP} docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN registry.gitlab.com
+    - ssh ${DEPLOYMENT_SERVER_USER}@${DEPLOYMENT_SERVER_IP} docker pull registry.gitlab.com/itproject41/eco-tickets
+    - ssh ${DEPLOYMENT_SERVER_USER}@${DEPLOYMENT_SERVER_IP} "docker container stop eco_tickets && docker container rm eco-tickets || true"
+    - ssh ${DEPLOYMENT_SERVER_USER}@${DEPLOYMENT_SERVER_IP} docker run --name eco_tickets -p 8080:8080 --network=postgresql-ecoticket_app-tier --env POSTGRES_PORT_5432_TCP_PORT=5432 --env POSTGRES_PORT_5432_TCP_ADDR=ecoticket_postgresql --env POSTGRES_ENV_POSTGRES_DB=alfio --env POSTGRES_ENV_POSTGRES_USERNAME=postgres --env POSTGRES_ENV_POSTGRES_PASSWORD=password --env SPRING_PROFILES_ACTIVE=dev -d registry.gitlab.com/itproject41/eco-tickets
+  tags:
+      - environment:development
+
+
 
 
 
