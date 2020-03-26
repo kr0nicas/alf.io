@@ -35,7 +35,7 @@ build:
   script:
       - ./gradlew -g /cache/.gradle clean assemble
   allow_failure: false
-  script: gradle --build-cache assemble
+  script: ./gradle --build-cache assemble
   cache:
       key: "$CI_COMMIT_REF_NAME"
       policy: push
