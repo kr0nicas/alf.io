@@ -33,7 +33,15 @@ build:
   image: gradle:5.0-jdk8-alpine
   stage: build
   script:
-    - gradle distribution
+      - ./gradlew -g /cache/.gradle clean assemble
+  allow_failure: false
+  script: gradle --build-cache assemble
+  cache:
+      key: "$CI_COMMIT_REF_NAME"
+      policy: push
+      paths:
+          - build
+          - .gradle
   artifacts:
     paths:
       - build/dockerize
