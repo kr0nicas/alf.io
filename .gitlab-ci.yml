@@ -21,7 +21,7 @@ before_script:
     - echo `pwd`
     - echo `ls`
     - echo `whoami`
-    #- chmod +x gradlew
+    - chmod +x gradlew
     - export GRADLE_USER_HOME=`pwd`/.gradle
 
 stages:
@@ -33,7 +33,7 @@ build:
   image: gradle:5.0-jdk8-alpine
   stage: build
   script:
-    - ./gradle distribution
+    - gradle distribution
   artifacts:
     paths:
       - build/dockerize
