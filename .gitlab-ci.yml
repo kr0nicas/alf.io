@@ -50,9 +50,6 @@ build:
         paths:
             - build
             - .gradle
-    artifacts:
-        paths:
-            - build/dockerize
     tags:
        - environment:development
 
