@@ -134,7 +134,7 @@ deploy_on_staging:
     - ssh ${DEPLOYMENT_SERVER_USER}@${DEPLOYMENT_SERVER_IP} docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN registry.gitlab.com
     - ssh ${DEPLOYMENT_SERVER_USER}@${DEPLOYMENT_SERVER_IP} docker pull registry.gitlab.com/itproject41/eco-tickets
     - ssh ${DEPLOYMENT_SERVER_USER}@${DEPLOYMENT_SERVER_IP} "docker container stop eco_tickets && docker container rm eco-tickets || true"
-    - ssh ${DEPLOYMENT_SERVER_USER}@${DEPLOYMENT_SERVER_IP} docker run --name eco_tickets -p 8080:8080 --network=postgresql-ecoticket_app-tier --env POSTGRES_PORT_5432_TCP_PORT=5432 --env POSTGRES_PORT_5432_TCP_ADDR=ecoticket_postgresql --env POSTGRES_ENV_POSTGRES_DB=alfio --env POSTGRES_ENV_POSTGRES_USERNAME=postgres --env POSTGRES_ENV_POSTGRES_PASSWORD=password --env SPRING_PROFILES_ACTIVE=dev -d registry.gitlab.com/itproject41/eco-tickets
+    - ssh ${DEPLOYMENT_SERVER_USER}@${DEPLOYMENT_SERVER_IP} docker run --name eco_tickets -p 8080:8080 --network=postgresql-ecoticket_app-tier --env POSTGRES_PORT_5432_TCP_PORT=5432 --env POSTGRES_PORT_5432_TCP_ADDR=postgresql-ecoticket_postgresql_1 --env POSTGRES_ENV_POSTGRES_DB=alfio --env POSTGRES_ENV_POSTGRES_USERNAME=postgres --env POSTGRES_ENV_POSTGRES_PASSWORD=password --env SPRING_PROFILES_ACTIVE=dev -d registry.gitlab.com/itproject41/eco-tickets
   tags:
       - environment:development
 
