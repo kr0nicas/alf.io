@@ -66,16 +66,16 @@ package:
         - environment:development
 
 # Use the generated build output to run the tests.
-test:
-    stage: test
-    script:
-        - ./gradlew -g /cache/.gradle check
-    script: gradle check
-    cache:
-        key: "$CI_COMMIT_REF_NAME"
-        policy: pull
-        paths:
-            - build
-            - .gradle
-    tags:
-        - environment:development
+# test:
+#     stage: test
+#     script:
+#         - ./gradlew -g /cache/.gradle check
+#     script: gradle check
+#     cache:
+#         key: "$CI_COMMIT_REF_NAME"
+#         policy: pull
+#         paths:
+#             - build
+#             - .gradle
+#     tags:
+#         - environment:development
