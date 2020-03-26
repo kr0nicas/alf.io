@@ -55,6 +55,7 @@ package:
   script:
     - ./gradlew distribution -x test
     - echo `pwd`
+    - echo `ls`
     - docker build -t registry.gitlab.com/itproject41/eco-tickets .
     - docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN registry.gitlab.com
     - docker push registry.gitlab.com/itproject41/eco-tickets
@@ -64,6 +65,11 @@ package:
          paths:
              - build
              - .gradle
+  artifacts:
+    paths:
+      - ./dockerize
+    expire_in:
+      - 1 day
   tags:
         - environment:development
 
