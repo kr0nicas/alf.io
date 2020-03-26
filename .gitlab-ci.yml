@@ -68,8 +68,7 @@ package:
   artifacts:
     paths:
       - ./dockerize
-    expire_in:
-      - 1 day
+    expire_in: '1 hrs'
   tags:
         - environment:development
 
