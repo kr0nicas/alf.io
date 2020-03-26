@@ -1,6 +1,6 @@
-image: docker:latest
-services:
-  - docker:dind
+default:
+  image: docker:latest
+
 
 variables:
     GRADLE_OPTS: "-Dorg.gradle.daemon=false"
@@ -27,7 +27,7 @@ before_script:
 stages:
   - build
   - package
-  - deploy
+  #- deploy
 
 build:
   image: gradle:5.0-jdk8-alpine
