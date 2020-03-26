@@ -26,21 +26,12 @@ variables:
 # https://docs.gradle.org/current/userguide/gradle_wrapper.html
 # It is expected that any modern gradle project has a wrapper
 
-package:
+build:
   stage: build
   before_script:
-    - echo `pwd`
-    - echo `ls`
-    - echo `whoami`
-    #- chmod +x gradlew
     - export GRADLE_USER_HOME=`pwd`/.gradle
   script:
     - ./gradlew distribution -x test
-    - echo `cd build`
-    - echo `ls`
-    #- docker build -t registry.gitlab.com/itproject41/eco-tickets .
-    #- docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN registry.gitlab.com
-    #- docker push registry.gitlab.com/itproject41/eco-tickets
   cache:
      key: "$CI_COMMIT_REF_NAME"
      policy: push
@@ -50,10 +41,10 @@ package:
   artifacts:
     paths:
       - build/dockerize
-    expire_in: '1 hrs'
+    expire_in: '1 week'
   tags:
         - environment:development
-docker:
+package:
   stage: package
   image: docker:latest
   variables:
@@ -95,12 +86,24 @@ docker:
   tags:
         - environment:development
 
-deploy_on_staging:
+deploy:
   stage: deploy
   image: docker:latest
   variables:
     DOCKER_DRIVER: overlay2
     DOCKER_TLS_CERTDIR: "/certs"
+    ECO_TICKET_REGISTRY_URL: registry.gitlab.com/itproject41/eco-tickets
+    ECO_TICKETS_NAME_CONTAINER: eco_tickets
+    ECO_TICKETS_EXPOSE_PORT: "8080:8080"
+    ECO_TICKET_NETWORK: postgresql-ecoticket_app-tier
+    POSTGRES_PORT_5432_TCP_PORT: "5432"
+    POSTGRES_PORT_5432_TCP_ADDR: postgresql-ecoticket_postgresql_1
+    POSTGRES_ENV_POSTGRES_DB: alfio
+    POSTGRES_ENV_POSTGRES_USERNAME: postgres
+    POSTGRES_ENV_POSTGRES_PASSWORD: password
+    SPRING_PROFILES_ACTIVE: dev
+
+
   services:
     - docker:dind
   before_script:
@@ -132,27 +135,8 @@ deploy_on_staging:
     #- apk add openssh-client
     #- apk add sshpass
     - ssh ${DEPLOYMENT_SERVER_USER}@${DEPLOYMENT_SERVER_IP} docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN registry.gitlab.com
-    - ssh ${DEPLOYMENT_SERVER_USER}@${DEPLOYMENT_SERVER_IP} docker pull registry.gitlab.com/itproject41/eco-tickets
-    - ssh ${DEPLOYMENT_SERVER_USER}@${DEPLOYMENT_SERVER_IP} "docker container stop eco_tickets && docker container rm eco-tickets || true"
-    - ssh ${DEPLOYMENT_SERVER_USER}@${DEPLOYMENT_SERVER_IP} docker run --name eco_tickets -p 8080:8080 --network=postgresql-ecoticket_app-tier --env POSTGRES_PORT_5432_TCP_PORT=5432 --env POSTGRES_PORT_5432_TCP_ADDR=postgresql-ecoticket_postgresql_1 --env POSTGRES_ENV_POSTGRES_DB=alfio --env POSTGRES_ENV_POSTGRES_USERNAME=postgres --env POSTGRES_ENV_POSTGRES_PASSWORD=password --env SPRING_PROFILES_ACTIVE=dev -d registry.gitlab.com/itproject41/eco-tickets
+    - ssh ${DEPLOYMENT_SERVER_USER}@${DEPLOYMENT_SERVER_IP} docker pull $ECO_TICKET_REGISTRY_URL
+    - ssh ${DEPLOYMENT_SERVER_USER}@${DEPLOYMENT_SERVER_IP} "docker container stop $ECO_TICKETS_NAME_CONTAINER && docker container rm $ECO_TICKETS_NAME_CONTAINER || true"
+    - ssh ${DEPLOYMENT_SERVER_USER}@${DEPLOYMENT_SERVER_IP} docker run --name $ECO_TICKETS_NAME_CONTAINER -p $ECO_TICKETS_EXPOSE_PORT --network= $ECO_TICKET_NETWORK --env POSTGRES_PORT_5432_TCP_PORT=$POSTGRES_PORT_5432_TCP_PORT --env POSTGRES_PORT_5432_TCP_ADDR=$POSTGRES_PORT_5432_TCP_ADDR --env POSTGRES_ENV_POSTGRES_DB=$POSTGRES_ENV_POSTGRES_DB --env POSTGRES_ENV_POSTGRES_USERNAME=$POSTGRES_ENV_POSTGRES_USERNAME --env POSTGRES_ENV_POSTGRES_PASSWORD=$POSTGRES_ENV_POSTGRES_PASSWORD --env SPRING_PROFILES_ACTIVE=$SPRING_PROFILES_ACTIVE -d $ECO_TICKET_REGISTRY_URL
   tags:
       - environment:development
-
-
-
-
-
-# Use the generated build output to run the tests.
-# test:
-#     stage: test
-#     script:
-#         - ./gradlew -g /cache/.gradle check
-#     script: gradle check
-#     cache:
-#         key: "$CI_COMMIT_REF_NAME"
-#         policy: pull
-#         paths:
-#             - build
-#             - .gradle
-#     tags:
-#         - environment:development
