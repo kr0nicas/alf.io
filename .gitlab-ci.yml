@@ -54,11 +54,11 @@ package:
   stage: build
   script:
     - ./gradlew distribution -x test
-    - echo `pwd`
+    - echo `cd build`
     - echo `ls`
-    - docker build -t registry.gitlab.com/itproject41/eco-tickets .
-    - docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN registry.gitlab.com
-    - docker push registry.gitlab.com/itproject41/eco-tickets
+    #- docker build -t registry.gitlab.com/itproject41/eco-tickets .
+    #- docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN registry.gitlab.com
+    #- docker push registry.gitlab.com/itproject41/eco-tickets
   cache:
          key: "$CI_COMMIT_REF_NAME"
          policy: push
@@ -67,10 +67,30 @@ package:
              - .gradle
   artifacts:
     paths:
-      - ./dockerize
+      - ./build
     expire_in: '1 hrs'
   tags:
         - environment:development
+docker:
+  stage: build
+  image: docker:latest
+  services:
+    - docker:dind
+  script:
+    - echo `cd build`
+    - echo `ls`
+    - docker info
+    #- docker build -t registry.gitlab.com/itproject41/eco-tickets .
+    #- docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN registry.gitlab.com
+    #- docker push registry.gitlab.com/itproject41/eco-tickets
+  artifacts:
+    paths:
+      - ./build
+    expire_in: '1 hrs'
+  tags:
+        - environment:development
+
+
 
 # Use the generated build output to run the tests.
 # test:
