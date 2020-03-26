@@ -34,21 +34,34 @@ before_script:
 # cleaning removes reminants of any cached builds.
 # The assemble task actually builds the project.
 # If it fails here, the tests can't run.
-build:
-    stage: build
-    script:
-        - ./gradlew -g /cache/.gradle clean assemble
-    allow_failure: false
-    script: gradle --build-cache assemble
-    cache:
-        key: "$CI_COMMIT_REF_NAME"
-        policy: push
-        paths:
-            - build
-            - .gradle
-    tags:
-       - environment:development
+# build:
+#     stage: build
+#     script:
+#         - ./gradlew -g /cache/.gradle clean assemble
+#     allow_failure: false
+#     script: gradle --build-cache assemble
+#     cache:
+#         key: "$CI_COMMIT_REF_NAME"
+#         policy: push
+#         paths:
+#             - build
+#             - .gradle
+#     tags:
+#        - environment:development
 
+package:
+  stage: package
+  script:
+    - ./gradlew distribution
+    - docker build -t registry.gitlab.com/itproject41/eco-tickets .
+    - docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN registry.gitlab.com
+    - docker push registry.gitlab.com/itproject41/eco-tickets
+  cache:
+         key: "$CI_COMMIT_REF_NAME"
+         policy: push
+         paths:
+             - build
+             - .gradle
 
 # Use the generated build output to run the tests.
 test:
