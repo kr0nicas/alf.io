@@ -42,18 +42,22 @@ build:
     script:
         - ./gradlew -g /cache/.gradle clean assemble
     allow_failure: false
-    script: gradle --build-cache assemble
+    script: gradle --build-cache distribution
     cache:
         key: "$CI_COMMIT_REF_NAME"
         policy: push
         paths:
             - build
             - .gradle
+    artifacts:
+    paths:
+      - build/dockerize
     tags:
        - environment:development
 
 package:
   stage: package
+  image: docker:lastest
   services: 
     - docker:dind
   variables:
